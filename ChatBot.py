@@ -1,12 +1,14 @@
 import os
 from dotenv import load_dotenv
 import g4f
+from g4f.errors import RetryProviderError
 
 load_dotenv()
 
 model = os.getenv("MODEL")
 proxy = os.getenv("PROXY")
 
+print(f"{proxy = }")
 
 class ChatBot:
     def __init__(self):
@@ -47,9 +49,8 @@ class ChatBot:
                     continue
 
                 break
-            except Exception as ex:
-                print(ex)
-                continue
+            except RetryProviderError as e:
+                print(e)
 
         return response.replace("\"", "")
     

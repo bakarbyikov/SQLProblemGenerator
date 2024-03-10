@@ -1,5 +1,12 @@
+import os
+from dotenv import load_dotenv
 import g4f
-import random 
+
+load_dotenv()
+
+model = os.getenv("MODEL")
+proxy = os.getenv("PROXY")
+
 
 class ChatBot:
     def __init__(self):
@@ -13,14 +20,14 @@ class ChatBot:
         while True:
             try:    
                 response = g4f.ChatCompletion.create(
-                    model=g4f.models.gpt_35_long,
                     messages=[
                         {"role": "user", "content": f"{random_query}"},
                         {"role": "system", "content": "Инструкции: 1)Переведи запрос на русский человеческий язык. \
                             2)Нужно делать перевод запроса в стиле задания \"Выберите...\" \" \
                             3)Дополнительно в скобках () по мере текста укажи названия таблиц и полей таблиц на английском"}],
-                    # proxy="http://160.153.0.19:80",
-                    timeout=200,
+                    timeout = 200,
+                    model=model,
+                    proxy=proxy
                 )
                 
                 response_check = response
@@ -41,13 +48,18 @@ class ChatBot:
 
                 break
             except Exception as ex:
+                print(ex)
                 continue
 
         return response.replace("\"", "")
     
 
-    
+if __name__ == "__main__":
+    from DatabaseConnector import DatabaseConnector
+    from QueryGenerator import QueryGenerator
 
-
-
-
+    db = DatabaseConnector("dbs/Book.db")
+    gen = QueryGenerator(db)
+    query = gen.generate_random_query()
+    columns = gen.columns_with_name_table
+    print(ChatBot.get_task_from_query(query, columns))

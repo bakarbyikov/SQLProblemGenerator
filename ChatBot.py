@@ -13,13 +13,13 @@ class ChatBot:
         while True:
             try:    
                 response = g4f.ChatCompletion.create(
-                    model=g4f.models.default,
+                    model=g4f.models.gpt_35_long,
                     messages=[
                         {"role": "user", "content": f"{random_query}"},
                         {"role": "system", "content": "Инструкции: 1)Переведи запрос на русский человеческий язык. \
                             2)Нужно делать перевод запроса в стиле задания \"Выберите...\" \" \
                             3)Дополнительно в скобках () по мере текста укажи названия таблиц и полей таблиц на английском"}],
-                    proxy="http://160.153.0.19:80",
+                    # proxy="http://160.153.0.19:80",
                     timeout=200,
                 )
                 

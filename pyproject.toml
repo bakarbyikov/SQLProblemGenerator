@@ -7,9 +7,10 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-g4f = "0.2.2.8"
+g4f = {extras = ["all"], version = "^0.2.3.0"}
 matplotlib = "3.8.2"
 pandas = "2.2.1"
+brotli = "^1.1.0"
 
 
 [build-system]

@@ -21,7 +21,7 @@ def main():
         result = db_connector.execute_query(random_query)
         
         path = f"bd_arhive/task_type_1/{i + 1}"
-        os.makedirs(path)
+        os.makedirs(path, exist_ok=True)
         #return [random_query, task_from_query, result, random_query_remove]
         
         task2 = Task.generate_task_2(random_query, generator.columns_with_name_table, result)
@@ -32,7 +32,7 @@ def main():
             string = f"correct_query = {task2[0]};\nresult_query = {task2[2]};\ntask_query_txt = {task2[1]};\ntask_query_remove = {task2[3]}"
             file.write(string)  
          
-        print(i)
+        print(i, task2)
 
     #task3
     for i in range(0, 100):
@@ -45,7 +45,7 @@ def main():
         result = db_connector.execute_query(random_query)
         
         path = f"bd_arhive/task_type_2/{i + 1}"
-        os.makedirs(path)
+        os.makedirs(path, exist_ok=True)
         #return [random_query, task_from_query, result, incorrect_querys]
         
         task3 = Task.generate_task_3(random_query, generator.columns_with_name_table, result)
@@ -56,12 +56,8 @@ def main():
             string = f"correct_query = {task3[0]};\nresult_query = {task3[2]};\ntask_query_txt = {task3[1]};\nincorrect_querys = {task3[3]}"
             file.write(string)  
          
-        print(i)    
-        
-        
-        
-        
+        print(i, task3)
+
 
 if __name__ == "__main__":
     main()
-

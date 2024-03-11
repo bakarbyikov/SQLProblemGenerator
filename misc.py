@@ -11,7 +11,7 @@ class Column_type(Enum):
 
 
 Comparisons = {
-    Column_type.numeric:  ["<", "<=", ">=", ">"],
+    Column_type.numeric: ["<", "<=", ">=", ">"],
     Column_type.textual: ["LIKE", "NOT LIKE"],
     Column_type.boolean: ["AND", "OR"],
     # Column_type.date: [],

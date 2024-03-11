@@ -16,14 +16,24 @@ class Database:
     def get_columns_info(self, table_name: str) -> list[Column_info]:
         raise NotImplementedError
     
-    def get_column_mininax(self, table_name: str, 
+    def get_mininax(self, table_name: str, 
                            column_name: str) -> tuple[float|int]:
+        raise NotImplementedError
+    
+    def get_unique_letters(self, table_name: str, column_name: str) -> str:
         raise NotImplementedError
     
 class Sqlite3(Database):
     def __init__(self, database_path: str):
         self.con = sqlite3.connect(database_path, detect_types=sqlite3.PARSE_DECLTYPES)
         self.cursor = self.con.cursor()
+    
+    def get_unique_letters(self, table_name: str, column_name: str) -> str:
+        self.cursor.execute(f"SELECT DISTINCT {column_name} FROM {table_name};")
+        letters = set()
+        for name in self.cursor.fetchall():
+            letters.update(*name)
+        return ''.join(letters)
     
     def get_tables_info(self) -> list[Table_info]:
         self.cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
@@ -39,7 +49,7 @@ class Sqlite3(Database):
             columns.append(Column_info(name, type_))
         return columns
     
-    def get_column_mininax(self, table_name: str, 
+    def get_mininax(self, table_name: str, 
                            column_name: str) -> tuple[float|int]:
         query = f"SELECT MIN({column_name}), MAX({column_name}) FROM {table_name}"
         self.cursor.execute(query)
@@ -70,4 +80,5 @@ if __name__ == "__main__":
             print(name)
             print(db.get_columns_info(name))
 
-    print(db.get_column_mininax("Author", "Birth_year"))
+    print(db.get_mininax("Author", "Birth_year"))
+    print(db.get_unique_letters("Author", "Name"))

@@ -31,7 +31,7 @@ class QueryGenerator:
         random.seed(seed)
         parts = [
             "SELECT",
-            ", ".join(self.create_args()),
+            self.create_selection(),
             "FROM",
             self.table.name,
             self.create_where()
@@ -41,10 +41,10 @@ class QueryGenerator:
 
 if __name__ == "__main__":
     from DatabaseConnector import Sqlite3
-    table = Table(Sqlite3("dbs/Book.db"), "Author")
+    db = Sqlite3("dbs/Book.db")
+    table = Table(db, "Author")
     gen = QueryGenerator(table)
-    for i in range(50):
-        try:
-            print(gen.generate())
-        except NotImplementedError:
-            pass
+    for i in range(10**4):
+        query = gen.generate()
+        print(query)
+        res = db.execute_query(query)

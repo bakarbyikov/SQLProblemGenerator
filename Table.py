@@ -18,16 +18,16 @@ class Table:
         return [cls(db, *name) for name in db.get_tables_info()]
     
     def parse_column(self, column: Column_info) -> Column:
-        if column.type_ == "INTEGER":
-            min_, max_ = self.db.get_column_mininax(self.name, column.name)
-            return NumericColumn(column.name, min_, max_)
-        if column.type_ == "TEXT":
-            letters = string.ascii_lowercase
-            return TextualColumn(column.name, letters)
-        if column.type_ == "BOOLEAN":
-            return BooleanColumn(column.name)
-        if column.type_ == "DATE":
-            return DateColumn(column.name)
+        match column.type_:
+            case "INTEGER":
+                column_class = NumericColumn
+            case "TEXT":
+                column_class = TextualColumn
+            case "BOOLEAN":
+                column_class = BooleanColumn
+            case "DATE":
+                column_class = DateColumn
+        return column_class(column.name, self.name, self.db)
     
     def init_columns(self) -> list[Column]:
         columns = self.db.get_columns_info(self.name)

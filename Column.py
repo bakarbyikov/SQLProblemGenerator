@@ -1,11 +1,16 @@
 import random
+import string
 
+from DatabaseConnector import Database
 from misc import Patterns
 
 
 class Column:
-    def __init__(self, name: str):
+    isnull = ["IS NULL", "IS NOT NULL"]
+    def __init__(self, name: str, tabe_name: str, db: Database):
         self.name = name
+        self.tabe_name = tabe_name
+        self.db = db
     
     def create_condition(self) -> str:
         raise NotImplementedError
@@ -15,10 +20,10 @@ class Column:
 
 class NumericColumn(Column):
     comparisons = ["<", "<=", ">=", ">"]
-    def __init__(self, name: str, min: int|float, max: int|float):
-        self.min, self.max = min, max
-        self.is_int = isinstance(min, int)
-        super().__init__(name)
+    def __init__(self, name: str, tabe_name: str, db: Database):
+        super().__init__(name, tabe_name, db)
+        self.min, self.max = self.db.get_mininax(self.tabe_name, self.name)
+        self.is_int = isinstance(self.min, int)
     
     def create_condition(self) -> str:
         operator = random.choice(self.comparisons)
@@ -31,9 +36,9 @@ class NumericColumn(Column):
 
 class TextualColumn(Column):
     comparisons = ["LIKE", "NOT LIKE"]
-    def __init__(self, name: str, letters: str):
-        self.letters = letters
-        super().__init__(name)
+    def __init__(self, name: str, tabe_name: str, db: Database):
+        super().__init__(name, tabe_name, db)
+        self.letters = self.db.get_unique_letters(self.tabe_name, self.name)
 
     def create_condition(self) -> str:
         operator = random.choice(self.comparisons)
@@ -52,5 +57,7 @@ class DateColumn(Column):
         raise NotImplementedError
 
 if __name__ == "__main__":
-    c = Column("Oleg")
-    print(c)
+    from DatabaseConnector import Sqlite3
+    db = Sqlite3("dbs/Book.db")
+    c = NumericColumn("Birth_year", "Author", db)
+    print(c.is_int)

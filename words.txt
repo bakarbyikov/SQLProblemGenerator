@@ -1,32 +1,32 @@
---
-DISTINCT
-AS
+== selection ==
+- DISTINCT
+- AS
 
---
-ORDER BY
-DESC / ASC
+== sorting ==
+- ORDER BY
+- DESC / ASC
 
---
-LIMIT
-OFFSET
+== limiting ==
+- LIMIT
+- OFFSET
 
---
-WHERE
-[NOT] IN
-AND / OR
-BETWEEN
-LIKE
-IS NULL
+== conditions ==
+- WHERE       +
+- [NOT] IN    
+- AND / OR    +
+- BETWEEN
+- LIKE        +
+- IS NULL
 
--- 
-AVG
-COUNT
-SUM
-MIN
-MAX
-BOOL_AND / BOOL_OR
-STRING_AGG
+== aggregation ==
+- AVG
+- COUNT
+- SUM
+- MIN
+- MAX
+- BOOL_AND / BOOL_OR
+- STRING_AGG
 
---
-GROUP BY
-HAVING
+== grouping ==
+- GROUP BY
+- HAVING

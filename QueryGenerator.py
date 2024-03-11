@@ -108,5 +108,12 @@ class QueryGenerator:
         return query
 
 
+if __name__ == "__main__":
+    from DatabaseConnector import DatabaseConnector
+    from QueryGenerator import QueryGenerator
 
-
+    db = DatabaseConnector("dbs/Book.db")
+    gen = QueryGenerator(db)
+    for i in range(10):
+        query = gen.generate_random_query()
+        print(query)

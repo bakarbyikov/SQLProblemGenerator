@@ -1,0 +1,8 @@
+SELECT
+  [DISTINCT | DISTINCTROW | ALL]
+  select_expression,...
+FROM table_references
+[WHERE where_definition]
+[GROUP BY {unsigned_integer | col_name | formula}]
+[HAVING where_definition]
+[ORDER BY {unsigned_integer | col_name | formula} [ASC | DESC], ...]

@@ -56,10 +56,10 @@ class ChatBot:
     
 
 if __name__ == "__main__":
-    from DatabaseConnector import DatabaseConnector
+    from DatabaseConnector import Database
     from QueryGenerator import QueryGenerator
 
-    db = DatabaseConnector("dbs/Book.db")
+    db = Database("dbs/Book.db")
     gen = QueryGenerator(db)
     query = gen.generate_random_query()
     columns = gen.columns_with_name_table

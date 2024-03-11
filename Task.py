@@ -144,4 +144,11 @@ class Task:
             " Из предложенных 4 вариантов запросов выберите 1 который подходит под условия выборки."
         return [random_query, task_from_query, result, incorrect_querys]
 
+if __name__ == "__main__":
+    db = Sqlite3("dbs/Book.db")
+    gen = QueryGenerator(db)
+    query = gen.generate_random_query()
+    result = db.execute_query(query)
+    task2 = Task.generate_task_2(query, gen.columns_with_name_table, result)
+    print(task2)
 

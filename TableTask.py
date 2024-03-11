@@ -17,3 +17,9 @@ class Table:
     
     def get_table(self):
         return plt
+
+if __name__ == "__main__":
+    from DatabaseConnector import Sqlite3
+    db = Sqlite3("dbs/Book.db")
+    table = Table(db.get_table_names_with_columns())
+    table.get_table().show()    

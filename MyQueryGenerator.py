@@ -1,62 +1,48 @@
 import random
-import string
-from DatabaseConnector import DatabaseConnector
-from misc import Column, Table, Comparisons, Column_type
+
+from misc import Column_type, Comparisons
+from Table import Table
 
 
 class QueryGenerator:
-    def __init__(self, database: DatabaseConnector):
-        self.db = database
+    def __init__(self, table: Table):
+        self.table = table
     
-    def create_args(self, table: Table) -> list[str]:
-        n_args = random.randint(1, len(table.columns))
-        choosen = random.sample(table.columns, k=n_args)
+    def create_selection(self) -> str:
+        return ", ".join(self.create_args())
+    
+    def create_args(self) -> list[str]:
+        n_args = random.randint(1, len(self.table.columns))
+        choosen = random.sample(self.table.columns, k=n_args)
         return [column.name for column in choosen]
     
-    def create_condition(self, column: Column) -> str:
-        if column.type_ not in Comparisons:
-            raise NotImplementedError
-        operator = random.choice(Comparisons[column.type_])
-        match column.type_:
-            case Column_type.numeric:
-                arg = random.randrange(1000)
-            case Column_type.textual:
-                arg = f"'%{random.choice(string.ascii_lowercase)}%'"
-            case Column_type.boolean:
-                raise NotImplementedError
-        return f"{column.name} {operator} {arg}"
-    
-    def create_where(self, table: Table) -> str:
-        query = ["WHERE"]
-        n_conditions = random.randint(1, len(table.columns))
-        choosen = random.sample(table.columns, k=n_conditions)
-        for i, column in enumerate(choosen):
-            query.append(self.create_condition(column))
-            query.append(random.choice(Comparisons[Column_type.boolean]))
-        assert len(query) >= 1
-        query.pop()
-        return " ".join(query)
+    def create_where(self) -> str:
+        parts = ["WHERE"]
+        n_conditions = random.randint(1, len(self.table.columns))
+        choosen = random.sample(self.table.columns, k=n_conditions)
+        for column in choosen:
+            parts.append(column.create_condition())
+            parts.append(random.choice(Comparisons[Column_type.boolean]))
+        assert len(parts) >= 1
+        parts.pop()
+        return " ".join(parts)
     
     def generate(self, seed: int=None):
         random.seed(seed)
-        query = ["SELECT"]
-
-        table = random.choice(self.db.get_tables())
-
-        args = self.create_args(table)
-        query.append(", ".join(args))
-
-        query.append("FROM")
-        query.append(table.name)
-
-        query.append(self.create_where(table))
-
-        return " ".join(query)
+        parts = [
+            "SELECT",
+            ", ".join(self.create_args()),
+            "FROM",
+            self.table.name,
+            self.create_where()
+            ]
+        return " ".join(parts)
 
 
 if __name__ == "__main__":
-    db = DatabaseConnector("dbs/Book.db")
-    gen = QueryGenerator(db)
+    from DatabaseConnector import Sqlite3
+    table = Table(Sqlite3("dbs/Book.db"), "Author")
+    gen = QueryGenerator(table)
     for i in range(50):
         try:
             print(gen.generate())

@@ -11,9 +11,9 @@ def main():
     db_names = ["Book.db", "Car.db", "Planets.db"]
     
     #task2
-    for i in range(45, 100):
+    for i in range(3):
         db_path = "dbs/" + random.choice(db_names)
-        db_connector = DatabaseConnector(db_path)
+        db_connector = Sqlite3(db_path)
         table_task = Table(db_connector.get_table_names_with_columns())
         generator = QueryGenerator(db_connector)
         
@@ -35,9 +35,9 @@ def main():
         print(i, task2)
 
     #task3
-    for i in range(0, 100):
+    for i in range(3):
         db_path = "dbs/" + random.choice(db_names)
-        db_connector = DatabaseConnector(db_path)
+        db_connector = Sqlite3(db_path)
         table_task = Table(db_connector.get_table_names_with_columns())
         generator = QueryGenerator(db_connector)
         

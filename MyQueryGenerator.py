@@ -36,6 +36,17 @@ class QueryGenerator:
     def create_limit(self) -> str:
         value = random.choice([5, 10, 20, 50])
         return f"LIMIT {value}"
+    
+    def create_order(self) -> str:
+        n_columns = random.randrange(1, len(self.table.order_columns))
+        order_by = random.sample(self.table.order_columns, k=n_columns)
+        columns = list()
+        for column in order_by:
+            if random.randrange(2):
+                columns.append(f"{column.name} DESC")
+            else:
+                columns.append(column.name)
+        return f"ORDER BY {", ".join(columns)}"
 
     def generate(self, seed: int=None):
         random.seed(seed)
@@ -45,6 +56,7 @@ class QueryGenerator:
             "FROM",
             self.table.name,
             self.create_where(),
+            self.create_order(),
             self.create_limit(),
             self.create_offset()
             ]

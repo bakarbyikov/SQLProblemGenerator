@@ -12,7 +12,7 @@ class Table:
         self.db = db
         self.name = name
         self.columns = self.init_columns()
-        self.order_columns = self.filter_order(self)
+        self.order_columns = self.filter_order()
     
     @classmethod
     def from_database(cls, db: Database) -> list[Self]:

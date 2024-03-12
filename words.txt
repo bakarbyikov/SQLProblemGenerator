@@ -4,11 +4,12 @@
 
 == sorting ==
 - ORDER BY
-- DESC / ASC
+- DESC
+- ASC
 
 == limiting ==
-- LIMIT
-- OFFSET
+- LIMIT       +
+- OFFSET      +
 
 == conditions ==
 - WHERE       +
@@ -24,7 +25,8 @@
 - SUM
 - MIN
 - MAX
-- BOOL_AND / BOOL_OR
+- BOOL_AND 
+- BOOL_OR
 - STRING_AGG
 
 == grouping ==

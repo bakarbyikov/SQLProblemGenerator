@@ -1,5 +1,7 @@
 import random
 
+from tqdm import tqdm
+
 from misc import Column_type, Comparisons
 from Table import Table
 
@@ -27,6 +29,14 @@ class QueryGenerator:
         parts.pop()
         return " ".join(parts)
     
+    def create_offset(self) -> str:
+        value = random.choice([5, 10, 20, 50])
+        return f"OFFSET {value}"
+    
+    def create_limit(self) -> str:
+        value = random.choice([5, 10, 20, 50])
+        return f"LIMIT {value}"
+
     def generate(self, seed: int=None):
         random.seed(seed)
         parts = [
@@ -34,7 +44,9 @@ class QueryGenerator:
             self.create_selection(),
             "FROM",
             self.table.name,
-            self.create_where()
+            self.create_where(),
+            self.create_limit(),
+            self.create_offset()
             ]
         return " ".join(parts)
 
@@ -44,7 +56,7 @@ if __name__ == "__main__":
     db = Sqlite3("dbs/Book.db")
     table = Table(db, "Author")
     gen = QueryGenerator(table)
-    for i in range(10**4):
+    for i in tqdm(range(10**6)):
         query = gen.generate()
-        print(query)
+        # print(query)
         res = db.execute_query(query)

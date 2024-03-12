@@ -23,6 +23,9 @@ class Database:
     def get_unique_letters(self, table_name: str, column_name: str) -> str:
         raise NotImplementedError
     
+    def get_random_values(self, table_name: str, column_name: str, n: int) -> tuple:
+        raise NotImplementedError
+    
 class Sqlite3(Database):
     def __init__(self, database_path: str):
         self.con = sqlite3.connect(database_path, detect_types=sqlite3.PARSE_DECLTYPES)
@@ -55,6 +58,11 @@ class Sqlite3(Database):
         self.cursor.execute(query)
         return tuple(*self.cursor.fetchall())
     
+    def get_random_values(self, table_name: str, column_name: str, n: int) -> tuple:
+        query = f"SELECT {column_name} FROM {table_name} ORDER BY RANDOM() LIMIT {n};"
+        self.cursor.execute(query)
+        values, *_ = zip(*self.cursor.fetchall())
+        return values
     
     def get_table_names_with_columns(self):
         tables = {}
@@ -82,3 +90,4 @@ if __name__ == "__main__":
 
     print(db.get_mininax("Author", "Birth_year"))
     print(db.get_unique_letters("Author", "Name"))
+    print(db.get_random_values("Author", "Name", 3))

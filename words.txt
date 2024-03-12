@@ -12,11 +12,11 @@
 
 == conditions ==
 - WHERE       +
-- [NOT] IN    
+- [NOT] IN    +
 - AND / OR    +
-- BETWEEN
+- BETWEEN     +
 - LIKE        +
-- IS NULL
+- IS NULL     +
 
 == aggregation ==
 - AVG

@@ -18,3 +18,7 @@ class Patterns(Enum):
     Starts_with = "'{}%'"
     Ends_with = "'%{}'"
     Contains = "'%{}%'"
+
+
+def add_apostrophe(string: str) -> str:
+    return f"'{string}'"

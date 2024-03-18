@@ -6,6 +6,7 @@ from misc import Patterns, add_apostrophe
 
 class Column:
     isnull = ["IS NULL", "IS NOT NULL"]
+    aggregations = ["COUNT"]
 
     def __init__(self, name: str, tabe_name: str, db: Database):
         self.name = name
@@ -20,6 +21,10 @@ class Column:
     def create_condition(self) -> str:
         return random.choice(self.creaters)()
     
+    def create_aggregation(self) -> str:
+        func = random.choice(self.aggregations)
+        return f"{func}({self.name})"
+    
     def __repr__(self) -> str:
         return f"{str(type(self))[:-1]} {self.name}>"
 
@@ -27,6 +32,7 @@ class NumericColumn(Column):
     comparisons = ["<", "<=", ">=", ">"]
     between = ["BETWEEN", "NOT BETWEEN"]
     in_ = ["IN", "NOT IN"]
+    aggregations = ["AVG", "SUM", "MIN", "MAX"]
     
     def __init__(self, name: str, tabe_name: str, db: Database):
         super().__init__(name, tabe_name, db)
@@ -51,6 +57,7 @@ class NumericColumn(Column):
 class TextualColumn(Column):
     mathcing = ["LIKE", "NOT LIKE"]
     in_ = ["IN", "NOT IN"]
+    # aggregations = ["STRING_AGG"]
 
     def __init__(self, name: str, tabe_name: str, db: Database):
         super().__init__(name, tabe_name, db)
@@ -68,9 +75,14 @@ class TextualColumn(Column):
         letter = random.choice(self.letters)
         arg = random.choice(list(Patterns)).value.format(letter)
         return f"{self.name} {operator} {arg}"
+    
+    # def create_aggregation(self) -> str:
+    #     func = random.choice(self.aggregations)
+    #     return f"{func}({self.name}, ', ')"
 
 class BooleanColumn(Column):
     inversion = ["", "NOT"]
+    aggregations = ["BOOL_AND", "BOOL_OR"]
     def __init__(self, name: str, tabe_name: str, db: Database):
         super().__init__(name, tabe_name, db)
         self.creaters.append(self.create_simple)

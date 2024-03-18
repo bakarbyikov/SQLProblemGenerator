@@ -18,9 +18,14 @@ class QueryGenerator:
         choosen = random.sample(self.table.columns, k=n_args)
         return [column.name for column in choosen]
     
+    def create_aggregation(self) -> list[str]:
+        n_args = random.randint(1, len(self.table.columns))
+        choosen = random.sample(self.table.columns, k=n_args)
+        return ", ".join([column.create_aggregation() for column in choosen])
+    
     def create_where(self) -> str:
         parts = ["WHERE"]
-        n_conditions = random.randint(1, len(self.table.columns))
+        n_conditions = random.randint(1, 2)#len(self.table.columns))
         choosen = random.sample(self.table.columns, k=n_conditions)
         for column in choosen:
             parts.append(column.create_condition())
@@ -57,14 +62,14 @@ class QueryGenerator:
         random.seed(seed)
         parts = [
             "SELECT",
-            self.create_distinct(),
-            self.create_selection(),
+            # self.create_distinct(),
+            self.create_aggregation(),
             "FROM",
             self.table.name,
             self.create_where(),
             self.create_order(),
             self.create_limit(),
-            self.create_offset()
+            # self.create_offset()
             ]
         return " ".join(parts)
 
@@ -74,7 +79,11 @@ if __name__ == "__main__":
     db = Sqlite3("dbs/Book.db")
     table = Table(db, "Author")
     gen = QueryGenerator(table)
+    for i in range(10):
+        query = gen.generate()
+        print(query)
+        res = db.execute_query(query)
+        print(res)
     for i in tqdm(range(10**6)):
         query = gen.generate()
-        # print(query)
         res = db.execute_query(query)

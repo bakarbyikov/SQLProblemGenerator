@@ -20,13 +20,13 @@ class Table:
     
     def parse_column(self, column: Column_info) -> Column:
         match column.type_:
-            case "INTEGER":
+            case "INTEGER" | "integer":
                 column_class = NumericColumn
-            case "TEXT":
+            case "TEXT" | "character varying" | "text":
                 column_class = TextualColumn
-            case "BOOLEAN":
+            case "BOOLEAN" | "boolean":
                 column_class = BooleanColumn
-            case "DATE":
+            case "DATE" | "date":
                 column_class = DateColumn
             case _:
                 raise ValueError(f"Not supported column type: {column.type_}")

@@ -62,28 +62,34 @@ class QueryGenerator:
         random.seed(seed)
         parts = [
             "SELECT",
-            # self.create_distinct(),
-            self.create_aggregation(),
+            self.create_distinct(),
+            self.create_selection(),
+            # self.create_aggregation(),
             "FROM",
             self.table.name,
             self.create_where(),
-            self.create_order(),
+            # self.create_order(),
             self.create_limit(),
-            # self.create_offset()
+            self.create_offset()
             ]
         return " ".join(parts)
 
 
 if __name__ == "__main__":
-    from DatabaseConnector import Sqlite3
-    db = Sqlite3("dbs/Book.db")
-    table = Table(db, "Author")
-    gen = QueryGenerator(table)
-    for i in range(10):
-        query = gen.generate()
-        print(query)
-        res = db.execute_query(query)
-        print(res)
-    for i in tqdm(range(10**6)):
-        query = gen.generate()
-        res = db.execute_query(query)
+    from DatabaseConnector import PosgresSQL
+    for db_name in PosgresSQL.get_db_list():
+        db = PosgresSQL(db_name)
+        print(db_name)
+
+        for tb_info in db.get_tables_info():
+            print(tb_info.name)
+            table = Table(db, tb_info.name)
+            gen = QueryGenerator(table)
+            # for i in range(10):
+            #     query = gen.generate()
+            #     print(query)
+            #     res = db.execute_query(query)
+            #     print(res)
+            for i in tqdm(range(10**4)):
+                query = gen.generate()
+                res = db.execute_query(query)

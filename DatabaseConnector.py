@@ -109,7 +109,7 @@ class PosgresSQL(Database):
             FROM pg_database
             WHERE datistemplate = 'f';
         """
-        return PosgresSQL("postgres").execute_query(query)
+        return PosgresSQL("postgres").execute_query(query)[1:]
     @staticmethod
     def create_database(scripts_path: str="db_create"):
         drop = """DROP DATABASE IF EXISTS "{name}";"""
@@ -143,7 +143,7 @@ class PosgresSQL(Database):
             WHERE table_schema not in ('information_schema', 'pg_catalog')
             AND table_type = 'BASE TABLE';
         """
-        return map(Table_info, self.execute_query(query))
+        return list(map(Table_info, self.execute_query(query)))
 
     def get_columns_info(self, table_name: str) -> list[Column_info]:
         query = f"""

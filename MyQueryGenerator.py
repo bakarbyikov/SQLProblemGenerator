@@ -47,11 +47,17 @@ class QueryGenerator:
             else:
                 columns.append(column.name)
         return f"ORDER BY {", ".join(columns)}"
+    
+    def create_distinct(self) -> str:
+        if random.randrange(2):
+            return "DISTINCT"
+        return ""
 
     def generate(self, seed: int=None):
         random.seed(seed)
         parts = [
             "SELECT",
+            self.create_distinct(),
             self.create_selection(),
             "FROM",
             self.table.name,

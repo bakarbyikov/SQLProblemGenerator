@@ -17,6 +17,10 @@ class Table:
     @classmethod
     def from_database(cls, db: Database) -> list[Self]:
         return [cls(db, *name) for name in db.get_tables_info()]
+
+    @property
+    def n_columns(self) -> int:
+        return len(self.columns)
     
     def parse_column(self, column: Column_info) -> Column:
         match column.type_:

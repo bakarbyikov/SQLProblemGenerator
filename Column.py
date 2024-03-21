@@ -14,6 +14,9 @@ class Column:
         self.db = db
         self.creaters = [self.create_null]
     
+    def get_name(self) -> str:
+        return self.name
+    
     def create_null(self) -> str:
         operator = random.choice(self.isnull)
         return f"{self.name} {operator}"

@@ -1,77 +1,95 @@
 import random
+from typing import NamedTuple
 
 from tqdm import tqdm
 
-from misc import Column_type, Comparisons
+from Column import Column
+from misc import interlay
 from Table import Table
 
+
+class Segment(NamedTuple):
+    start: int
+    end: int
+
+    def rvs(self):
+        return random.randint(*self)
+
+class Query_settings(NamedTuple):
+    n_args: Segment
+    add_distinct: bool
+    add_aggregation: bool
+    n_conditions: Segment
+    n_orders: Segment
+    limit: Segment
+    offset: Segment
 
 class QueryGenerator:
     def __init__(self, table: Table):
         self.table = table
     
-    def create_selection(self) -> str:
-        return ", ".join(self.create_args())
+    def choose_columns(self, n_args: Segment) -> list[Column]:
+        return random.sample(self.table.columns, k=n_args.rvs())
     
-    def create_args(self) -> list[str]:
-        n_args = random.randint(1, len(self.table.columns))
-        choosen = random.sample(self.table.columns, k=n_args)
-        return [column.name for column in choosen]
+    def create_selection(self, columns: list[Column]) -> str:
+        return ", ".join(c.name for c in columns)
     
-    def create_aggregation(self) -> list[str]:
-        n_args = random.randint(1, len(self.table.columns))
-        choosen = random.sample(self.table.columns, k=n_args)
-        return ", ".join([column.create_aggregation() for column in choosen])
+    def create_aggregation(self, columns: list[Column]) -> str:
+        return ", ".join(c.create_aggregation() for c in columns)
     
-    def create_where(self) -> str:
+    def create_where(self, n_conditions: Segment) -> str:
         parts = ["WHERE"]
-        n_conditions = random.randint(1, 2)#len(self.table.columns))
-        choosen = random.sample(self.table.columns, k=n_conditions)
-        for column in choosen:
-            parts.append(column.create_condition())
-            parts.append(random.choice(Comparisons[Column_type.boolean]))
-        assert len(parts) >= 1
-        parts.pop()
+        n_cond = random.randint(*n_conditions)
+        choosen = random.sample(self.table.columns, k=n_cond)
+        parts.extend(interlay(map(Column.create_condition, choosen),
+                              random.choices(["AND", "OR"], k=n_cond)))
         return " ".join(parts)
     
-    def create_offset(self) -> str:
-        value = random.choice([5, 10, 20, 50])
-        return f"OFFSET {value}"
-    
-    def create_limit(self) -> str:
-        value = random.choice([5, 10, 20, 50])
-        return f"LIMIT {value}"
-    
-    def create_order(self) -> str:
-        n_columns = random.randrange(1, len(self.table.order_columns))
-        order_by = random.sample(self.table.order_columns, k=n_columns)
-        columns = list()
-        for column in order_by:
+    def create_order(self, columns: list[Column], n_orders: Segment) -> str:
+        order_by = random.sample(columns, k=min(len(columns), n_orders.rvs()))
+        parts = list()
+        for c in order_by:
             if random.randrange(2):
-                columns.append(f"{column.name} DESC")
+                parts.append(c.name)
             else:
-                columns.append(column.name)
-        return f"ORDER BY {", ".join(columns)}"
+                parts.append(f"{c.name} DESC")
+        return f"ORDER BY {", ".join(parts)}"
     
-    def create_distinct(self) -> str:
-        if random.randrange(2):
-            return "DISTINCT"
-        return ""
+    def create_limit(self, limit: Segment) -> str:
+        return f"LIMIT {limit.rvs()}"
+    
+    def create_offset(self, offset: Segment) -> str:
+        return f"OFFSET {offset.rvs()}"
 
-    def generate(self, seed: int=None):
+    def generate(self, settings: Query_settings, seed: int=None) -> str:
         random.seed(seed)
-        parts = [
-            "SELECT",
-            self.create_distinct(),
-            self.create_selection(),
-            # self.create_aggregation(),
-            "FROM",
-            self.table.name,
-            self.create_where(),
-            # self.create_order(),
-            self.create_limit(),
-            self.create_offset()
-            ]
+        parts = ["SELECT"]
+        if settings.add_aggregation == settings.add_distinct:
+            raise ValueError("Cant create query with DISTINCT and AGGREGATION")
+        if settings.add_distinct:
+            parts.append("DISTINCT")
+
+        selected = self.choose_columns(settings.n_args)
+        if settings.add_aggregation:
+            parts.append(self.create_aggregation(selected))
+        else:
+            parts.append(self.create_selection(selected))
+
+        parts.append("FROM")
+        parts.append(self.table.name)
+
+        if settings.n_conditions.end:
+            parts.append(self.create_where(settings.n_conditions))
+        if settings.n_orders.end:
+            if settings.add_distinct:
+                columns = selected
+            else:
+                columns = self.table.columns
+            parts.append(self.create_order(columns, settings.n_orders))
+        if settings.limit.end:
+            parts.append(self.create_limit(settings.limit))
+        if settings.offset.end:
+            parts.append(self.create_offset(settings.offset))
         return " ".join(parts)
 
 
@@ -85,11 +103,21 @@ if __name__ == "__main__":
             print(tb_info.name)
             table = Table(db, tb_info.name)
             gen = QueryGenerator(table)
-            # for i in range(10):
-            #     query = gen.generate()
-            #     print(query)
-            #     res = db.execute_query(query)
-            #     print(res)
+            aggregation = bool(random.randrange(2))
+            setting = Query_settings(
+                n_args=Segment(1, table.n_columns),
+                add_distinct=not aggregation,
+                add_aggregation=aggregation,
+                n_conditions=Segment(1, table.n_columns),
+                n_orders=Segment(0, 0),
+                limit=Segment(1, 2),
+                offset=Segment(1, 2)
+            )
+            for i in range(10):
+                query = gen.generate(setting)
+                print(query)
+                res = db.execute_query(query)
+                print(res)
             for i in tqdm(range(10**4)):
-                query = gen.generate()
+                query = gen.generate(setting)
                 res = db.execute_query(query)

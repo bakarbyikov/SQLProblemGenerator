@@ -95,10 +95,10 @@ class QueryGenerator:
             self.self_test(n_tests//2, False)
             return
         settings = Query_settings(
-            n_args=Segment(1, table.n_columns),
+            n_args=Segment(1, self.table.n_columns),
             add_distinct=not aggregation,
             add_aggregation=aggregation,
-            n_conditions=Segment(1, table.n_columns),
+            n_conditions=Segment(1, self.table.n_columns),
             n_orders=Segment(1, 2),
             limit=Segment(1, 2),
             offset=Segment(1, 2)
@@ -112,7 +112,7 @@ class QueryGenerator:
                 print(f"{query = }")
                 raise
 
-if __name__ == "__main__":
+def full_test(n_test_per_table: int=10**3):
     from DatabaseConnector import PosgresSQL
     for db_name in PosgresSQL.get_db_list():
         db = PosgresSQL(db_name)
@@ -122,4 +122,8 @@ if __name__ == "__main__":
             print(tb_info.name)
             table = Table(db, tb_info.name)
             gen = QueryGenerator(table)
-            gen.self_test()
+            gen.self_test(n_test_per_table)
+
+if __name__ == "__main__":
+    full_test(10**3)
+

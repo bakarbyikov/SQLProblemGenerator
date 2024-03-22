@@ -1,6 +1,6 @@
 == selection ==
 - DISTINCT    +
-- AS
+- AS          +
 
 == sorting ==
 - ORDER BY    +
@@ -20,15 +20,15 @@
 - IS NULL     +
 
 == aggregation ==
-- AVG
-- COUNT
-- SUM
-- MIN
-- MAX
-- BOOL_AND 
-- BOOL_OR
-- STRING_AGG
+- AVG         +
+- COUNT       +
+- SUM         +
+- MIN         +
+- MAX         +
+- BOOL_AND    +
+- BOOL_OR     +
+- STRING_AGG  +
 
 == grouping ==
-- GROUP BY
+- GROUP BY    +
 - HAVING

@@ -3,6 +3,8 @@ import random
 from DatabaseConnector import Database
 from misc import Patterns, add_apostrophe
 
+Expression = str
+Column_name = str
 
 class Column:
     isnull = ["IS NULL", "IS NOT NULL"]
@@ -24,9 +26,11 @@ class Column:
     def create_condition(self) -> str:
         return random.choice(self.creaters)()
     
-    def create_aggregation(self) -> str:
+    def create_aggregation(self) -> tuple[Expression, Column_name]:
         func = random.choice(self.aggregations)
-        return f"{func}({self.name})"
+        column_name = f"{func}_{self.name}"
+        expression = f"{func}({self.name}) AS {column_name}"
+        return expression, column_name
     
     def __repr__(self) -> str:
         return f"{str(type(self))[:-1]} {self.name}>"
